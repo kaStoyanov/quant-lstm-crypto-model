@@ -21,7 +21,6 @@ import ccxt
 import json
 from datetime import datetime, date, timedelta
 
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -30,7 +29,7 @@ class CryptoModel:
         # self.createCsv('eth_usd_5min','ETH/USDT')
         self.loadData("data/btc_usd_1day.csv")
 
-    def createCsv(self,csvName,symbol):
+    def createCsv(self, csvName, symbol):
 
         exchange = ccxt.binance()
         from_ts = exchange.parse8601('2023-01-10 00:00:00')
@@ -57,10 +56,11 @@ class CryptoModel:
         df['volume'] = df['volume'].astype(np.float64)
         df.set_index('time', inplace=True)
         df.to_csv(f'data/{csvName}.csv')
-    def loadData(self,symbol):
+
+    def loadData(self, symbol):
         df = pd.read_csv(symbol, sep=',')
         # df = pd.read_csv("./model/binance-dataset.csv", sep=',')
-        df = df[["open","time"]]
+        df = df[["open", "time"]]
         df.set_index("time", inplace=True)
         df.index = pd.to_datetime(df.index)
         input_dim = 60
@@ -95,12 +95,11 @@ class CryptoModel:
         model = self.get_model('lstm', model_params)
         model = model.to(device)
 
-
         scaler = self.get_scaler('minmax')
         tss = TimeSeriesSplit(n_splits=config.FOLDS, max_train_size=None, test_size=None, gap=0)
 
         train_losses, validation_losses, oof, y_trues = self.train_function(X, y, model, tss, model_params)
-        p = PlotData(oof,train_losses,validation_losses,y_trues)
+        p = PlotData(oof, train_losses, validation_losses, y_trues)
         oof, y_trues = p.return_values()
         torch.save(model.state_dict(), "model/algo_trade.pth")
         plot_df = pd.DataFrame([oof, y_trues]).T

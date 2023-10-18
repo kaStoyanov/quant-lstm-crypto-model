@@ -7,7 +7,7 @@ from model.app import CryptoModel
 from model.config import config
 from model.rnn import RNNModel
 
-app = CryptoModel()
+# app = CryptoModel()
 exchange = ccxt.binance()
 
 
@@ -22,9 +22,8 @@ def get_model(model, model_params):
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-res = []
-data = exchange.fetch_ohlcv('BTC/USDT', '5m', limit=1)
-print(data)
+data = exchange.fetch_ohlcv('BTC/USDT', '5m', limit=68)
+# print(data)
 model_params = {
     'input_dim': len(data),
     'hidden_dim': config.HIDDEN_DIM,
@@ -34,8 +33,7 @@ model_params = {
     'device': device
 }
 model = get_model('lstm', model_params)
-model = model.to(device)
 model.load_state_dict(torch.load("model/algo_trade.pth"))
 model.eval()
-
-print(model(data))
+x = model(data)
+print(x)

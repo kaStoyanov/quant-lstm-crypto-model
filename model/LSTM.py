@@ -1,20 +1,8 @@
-import datetime
-import matplotlib.pyplot as plt
-import numpy as np
-import os
-import pandas as pd
-import time
 import torch
 import torch.nn as nn
-from model.config import config
-
-from sklearn.model_selection import TimeSeriesSplit
-from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler, RobustScaler, StandardScaler
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-from torch.utils.data import TensorDataset, DataLoader
-from tqdm import tqdm
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 class LSTMModel(nn.Module):
     def __init__(self, input_dim, hidden_dim, layer_dim, output_dim, dropout_prob, device):
@@ -35,6 +23,7 @@ class LSTMModel(nn.Module):
 
     def forward(self, x):
         # Initializing hidden state for first input with zeros
+        print(x)
         h0 = torch.zeros(self.layer_dim, x.size(0), self.hidden_dim).requires_grad_().to(device)
 
         # Initializing cell state for first input with zeros
